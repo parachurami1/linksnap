@@ -2,6 +2,7 @@ package cache
 
 import (
 	"context"
+	"os"
 
 	"github.com/redis/go-redis/v9"
 )
@@ -13,7 +14,7 @@ type Cache struct {
 func NewCache() (*Cache, error) {
 	var cache Cache
 	cln := *redis.NewClient(&redis.Options{
-		Addr: "localhost:6379",
+		Addr: os.Getenv("REDIS_URL"),
 		DB:   0,
 	})
 	cache.Client = &cln

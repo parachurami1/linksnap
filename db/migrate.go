@@ -12,7 +12,7 @@ import (
 
 func RunMigrations(dburl string) {
 	pth, _ := os.Getwd()
-	fil := filepath.Join(pth, "migrations")
+	fil := filepath.Join(pth, "migrations/")
 	migrationsURL := "file://" + filepath.ToSlash(fil) // ← three slashes
 
 	slog.Info("Running migrations from", "path", migrationsURL)
