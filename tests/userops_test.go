@@ -1,15 +1,16 @@
 package tests
 
 import (
+	"linksnap/cache"
 	"linksnap/db"
-	"linksnap/storage"
+	"linksnap/service"
 	"testing"
 )
 
 func TestCreateUser(t *testing.T) {
 	db.ConnectDB()
 	defer func() { db.DB.Exec("delete from users where email='Test@gmail.com'") }()
-	err := storage.CreateUser("Test@gmail.com", "P4ssw0rd", "user")
+	err := service.CreateUser("Test@gmail.com", "P4ssw0rd", "user")
 	if err != nil {
 		t.Errorf("Could not create user")
 	}
@@ -19,11 +20,15 @@ func TestCreateUser(t *testing.T) {
 func TestGetUser(t *testing.T) {
 	db.ConnectDB()
 	defer func() { db.DB.Exec("delete from users where email='Test@gmail.com'") }()
-	err := storage.CreateUser("Test@gmail.com", "P4ssw0rd", "user")
+	err := service.CreateUser("Test@gmail.com", "P4ssw0rd", "user")
 	if err != nil {
 		t.Errorf("Could not create user")
 	}
-	_, err = storage.GetUserByEmail("Test@gmail.com")
+	cac, err := cache.NewCache()
+	if err != nil {
+		t.Errorf("Failed to create cache")
+	}
+	_, err = service.GetUserByEmail(cac, "Test@gmail.com")
 	if err != nil {
 		t.Errorf("Could not get user")
 	}

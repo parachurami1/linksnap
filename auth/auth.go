@@ -1,13 +1,14 @@
 package auth
 
 import (
-	"linksnap/storage"
+	"linksnap/cache"
+	"linksnap/service"
 
 	"golang.org/x/crypto/bcrypt"
 )
 
-func Login(email string, password string) (string, error) {
-	person, err := storage.GetUserByEmail(email)
+func Login(email string, password string, cache *cache.Cache) (string, error) {
+	person, err := service.GetUserByEmail(cache, email)
 	if err != nil {
 		return "", err
 	}
@@ -23,7 +24,7 @@ func Login(email string, password string) (string, error) {
 }
 
 func Register(email string, password string, role string) error {
-	err := storage.CreateUser(email, password, role)
+	err := service.CreateUser(email, password, role)
 	if err != nil {
 		return err
 	}

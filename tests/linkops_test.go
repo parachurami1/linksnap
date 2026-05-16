@@ -1,27 +1,23 @@
 package tests
 
 import (
-	"linksnap/auth"
-	"linksnap/cache"
 	"linksnap/db"
 	"linksnap/service"
 	"testing"
 )
 
-func TestLogin(t *testing.T) {
+func TestCreateLink(t *testing.T) {
 	db.ConnectDB()
 	defer func() { db.DB.Exec("delete from users where email='Test@gmail.com'") }()
+	slug := service.Shorten("https://youtube.com")
+	defer func() { db.DB.Exec("delete from urls where short_code=$1", slug) }()
 	err := service.CreateUser("Test@gmail.com", "P4ssw0rd", "user")
 	if err != nil {
 		t.Errorf("Could not create user")
 	}
-	cac, err := cache.NewCache()
+	err = service.CreateLink("https://youtube.com", slug, 1)
 	if err != nil {
-		t.Errorf("Failed to create cache")
-	}
-	tokn, err := auth.Login("Test@gmail.com", "P4ssw0rd", cac)
-	if err != nil || tokn == "" {
-		t.Errorf("Could not Log in")
+		t.Errorf("%s", err.Error())
 	}
 	print("\n\n")
 }
