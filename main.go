@@ -29,6 +29,7 @@ func main() {
 	mux.HandleFunc("/register", handlers.RegisterHandler)
 	mux.HandleFunc("/login", handlers.LoginHandler)
 	mux.HandleFunc("/links", middleware.Protect(handlers.LinksHandler))
+	mux.HandleFunc("/links/{slug}", handlers.RedirectHandler)
 
 	c := cors.AllowAll()
 

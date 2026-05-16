@@ -1,6 +1,7 @@
 package storage
 
 import (
+	"linksnap/cache"
 	"linksnap/db"
 	"linksnap/models"
 	"time"
@@ -46,4 +47,21 @@ func GetLinks(userID int) ([]models.URL, error) {
 		return nil, err
 	}
 	return links, nil
+}
+func GetLinksBySlug(slug string) (models.URL, error) {
+	var url models.URL
+	err := db.DB.Get(&url, "SELECT * FROM urls WHERE short_code=$1", slug)
+	if err != nil {
+		return models.URL{}, err
+	}
+	return url, nil
+}
+
+func UpdateCount(cache *cache.Cache, slug string) error {
+	cache.DeleteByPattern("links:")
+	_, err := db.DB.Exec("UPDATE urls SET clicks=clicks + 1 WHERE short_code=$1", slug)
+	if err != nil {
+		return err
+	}
+	return nil
 }

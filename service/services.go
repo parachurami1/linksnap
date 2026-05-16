@@ -101,3 +101,33 @@ func CreateLink(cache *cache.Cache, link string, slug string, userID int) error 
 	}
 	return nil
 }
+
+func GetLinkBySlug(cache *cache.Cache, slug string) (models.URL, error) {
+	val := cache.Client.Get(context.Background(), fmt.Sprintf("links:%v", slug))
+	res, err := val.Result()
+	var link models.URL
+
+	if err == redis.Nil || err != nil {
+		if err != nil && err != redis.Nil {
+			slog.Error("Error getting from redis", "Error", err)
+		}
+		link, err := storage.GetLinksBySlug(slug)
+		if err != nil {
+			return models.URL{}, err
+		}
+		go func(lnk models.URL) {
+			data, err := json.Marshal(&lnk)
+			if err != nil {
+				return
+			}
+			cache.Client.Set(context.Background(), fmt.Sprintf("links:%v", slug), data, 15*time.Minute)
+		}(link)
+		return link, nil
+	}
+
+	err = json.Unmarshal([]byte(res), &link)
+	if err != nil {
+		return models.URL{}, err
+	}
+	return link, nil
+}

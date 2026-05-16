@@ -24,3 +24,21 @@ func NewCache() (*Cache, error) {
 	}
 	return &cache, nil
 }
+
+func (c *Cache) DeleteByPattern(pattern string) error {
+	var cursor uint64
+	for {
+		keys, nextCursor, err := c.Client.Scan(context.Background(), cursor, pattern, 10).Result()
+		if err != nil {
+			return err
+		}
+		if len(keys) > 0 {
+			c.Client.Del(context.Background(), keys...)
+		}
+		cursor = nextCursor
+		if cursor == 0 {
+			break
+		}
+	}
+	return nil
+}
