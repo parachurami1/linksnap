@@ -1,8 +1,10 @@
 package auth
 
 import (
+	"errors"
 	"linksnap/cache"
 	"linksnap/service"
+	"net/mail"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -24,7 +26,11 @@ func Login(email string, password string, cache *cache.Cache) (string, error) {
 }
 
 func Register(email string, password string, role string) error {
-	err := service.CreateUser(email, password, role)
+	_, err := mail.ParseAddress(email)
+	if err != nil {
+		return errors.New("Invalid email address")
+	}
+	err = service.CreateUser(email, password, role)
 	if err != nil {
 		return err
 	}

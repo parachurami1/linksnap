@@ -2,6 +2,7 @@ package db
 
 import (
 	"log/slog"
+	"os"
 
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/jmoiron/sqlx"
@@ -11,7 +12,7 @@ var DB *sqlx.DB
 var err error
 
 func ConnectDB() {
-	DB, err = sqlx.Open("pgx", "host=localhost port=5432 user=postgres password=p4ssw0rd database=Linksnap")
+	DB, err = sqlx.Open("pgx", os.Getenv("POSTGRES_URL"))
 	if err != nil {
 		slog.Error("Databese error", "Error", err)
 		return
