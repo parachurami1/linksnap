@@ -93,7 +93,8 @@ func GetLinksByID(cache *cache.Cache, userID int) ([]models.URL, error) {
 	return links, nil
 }
 
-func CreateLink(link string, slug string, userID int) error {
+func CreateLink(cache *cache.Cache, link string, slug string, userID int) error {
+	cache.Client.Del(context.Background(), fmt.Sprintf("links:%v", userID))
 	err := storage.SaveLink(link, slug, userID)
 	if err != nil {
 		return err

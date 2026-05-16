@@ -2,6 +2,7 @@ package auth
 
 import (
 	"errors"
+	"linksnap/models"
 	"os"
 	"time"
 
@@ -9,10 +10,12 @@ import (
 )
 
 func GenerateToken(userID int, userRole string) (string, error) {
-	claims := jwt.MapClaims{
-		"user_id": userID,
-		"role":    userRole,
-		"exp":     time.Now().Add(1 * time.Hour).Unix(),
+	claims := models.Claim{
+		User_ID: userID,
+		Role:    userRole,
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(15 * time.Minute)),
+		},
 	}
 	tokn := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	token, err := tokn.SignedString([]byte(os.Getenv("JWT_SECRET")))
@@ -34,4 +37,23 @@ func ParseToken(token string) (*jwt.Token, error) {
 	}
 
 	return result, nil
+}
+
+func ParseTokenClaims(token string) (*models.Claim, error) {
+	tokn, err := jwt.ParseWithClaims(token, &models.Claim{}, func(t *jwt.Token) (any, error) {
+		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, errors.New("invalid signing method")
+		}
+		return []byte(os.Getenv("JWT_SECRET")), nil
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	claims, ok := tokn.Claims.(*models.Claim)
+	if !ok || !tokn.Valid {
+		return nil, errors.New("invalid token")
+	}
+
+	return claims, nil
 }

@@ -28,6 +28,7 @@ func main() {
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) { fmt.Fprintf(w, "The server is running") })
 	mux.HandleFunc("/register", handlers.RegisterHandler)
 	mux.HandleFunc("/login", handlers.LoginHandler)
+	mux.HandleFunc("/links", middleware.Protect(handlers.LinksHandler))
 
 	c := cors.AllowAll()
 

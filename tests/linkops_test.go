@@ -1,6 +1,7 @@
 package tests
 
 import (
+	"linksnap/cache"
 	"linksnap/db"
 	"linksnap/service"
 	"testing"
@@ -15,7 +16,11 @@ func TestCreateLink(t *testing.T) {
 	if err != nil {
 		t.Errorf("Could not create user")
 	}
-	err = service.CreateLink("https://youtube.com", slug, 1)
+	cac, err := cache.NewCache()
+	if err != nil {
+		t.Errorf("Failed to create cache")
+	}
+	err = service.CreateLink(cac, "https://youtube.com", slug, 1)
 	if err != nil {
 		t.Errorf("%s", err.Error())
 	}

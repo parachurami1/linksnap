@@ -1,6 +1,10 @@
 package models
 
-import "time"
+import (
+	"time"
+
+	"github.com/golang-jwt/jwt/v5"
+)
 
 type URL struct {
 	Id           int       `db:"id"`
@@ -18,4 +22,10 @@ type User struct {
 	Password   string    `db:"password_hash"`
 	Role       string    `db:"role"`
 	Created_at time.Time `db:"created_at"`
+}
+
+type Claim struct {
+	User_ID int
+	Role    string
+	jwt.RegisteredClaims
 }
