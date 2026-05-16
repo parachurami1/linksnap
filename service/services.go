@@ -9,6 +9,7 @@ import (
 	"linksnap/storage"
 	"log/slog"
 	"math/rand/v2"
+	"strings"
 	"time"
 
 	"github.com/redis/go-redis/v9"
@@ -94,6 +95,9 @@ func GetLinksByID(cache *cache.Cache, userID int) ([]models.URL, error) {
 }
 
 func CreateLink(cache *cache.Cache, link string, slug string, userID int) error {
+	if !strings.HasPrefix(link, "https://") && !strings.HasPrefix(link, "http://") {
+		link = "http://" + link
+	}
 	cache.Client.Del(context.Background(), fmt.Sprintf("links:%v", userID))
 	err := storage.SaveLink(link, slug, userID)
 	if err != nil {
